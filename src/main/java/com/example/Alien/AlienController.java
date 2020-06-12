@@ -1,8 +1,10 @@
 package com.example.Alien;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,44 +18,35 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AlienController {
 
+    @Autowired
+    private AlienRepository alienRepository;
     public ArrayList<Alien> globalList = new ArrayList<>();
 
     @GetMapping(path = "/alien")
     public ResponseEntity<ArrayList<Alien>> getAllAliens() {
-        return new ResponseEntity<ArrayList<Alien>>(globalList, HttpStatus.OK);
+        Iterable<Alien> alienIterable = alienRepository.findAll();
+        ArrayList<Alien> _aliens = new ArrayList<>();
+        alienIterable.forEach(_aliens::add);
+        return new ResponseEntity<ArrayList<Alien>>(_aliens, HttpStatus.OK);
     }
 
-    @PostMapping(path = "/alien", consumes = { "application/json" })
+    @PostMapping(path = "/alien", consumes = {"application/json"})
     public ResponseEntity<Alien> addAlien(@RequestBody Alien alien) {
-        System.out.println("here");
-        Alien _alien = new Alien();
-        _alien.setId(UUID.randomUUID().toString().replace("-", ""));
-        _alien.setAname(alien.getAname());
-        _alien.setTech(alien.getTech());
-        globalList.add(_alien);
-        return new ResponseEntity<Alien>(_alien, HttpStatus.OK);
-    }
+        alienRepository.save(alien);
 
-    @PutMapping(path = "/alien/{id}", consumes = { "application/json" })
-    public ResponseEntity<Alien> updateAlien(@RequestBody Alien alien, @PathVariable("id") String id) {
-        for (int i = 0; i < globalList.size(); i++) {
-            Alien item = globalList.get(i);
-            if (item.getId().equals(id)) {
-                globalList.get(i).setAname(alien.getAname());
-                globalList.get(i).setTech(alien.getTech());
-            }
-        }
         return new ResponseEntity<Alien>(alien, HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/alien/{id}", consumes = { "application/json" })
-    public ResponseEntity<Alien> deleteAlien(@RequestBody Alien alien, @PathVariable("id") String id) {
-        for (int i = 0; i < globalList.size(); i++) {
-            Alien item = globalList.get(i);
-            if (item.getId().equals(id)) {
-                globalList.remove(i);
-            }
-        }
+    @PutMapping(path = "/alien/{id}", consumes = {"application/json"})
+    public ResponseEntity<Alien> updateAlien(@RequestBody Alien alien, @PathVariable("id") int id) {
+        alienRepository.save(alien);
+        return new ResponseEntity<Alien>(alien, HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/alien/{id}", consumes = {"application/json"})
+    public ResponseEntity<Alien> deleteAlien(@PathVariable("id") int id) {
+//
+        alienRepository.deleteById(id);
         return new ResponseEntity<Alien>(HttpStatus.OK);
     }
 

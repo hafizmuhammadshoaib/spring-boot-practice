@@ -1,8 +1,15 @@
 package com.example.Alien;
 
-public class Alien {
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-    private String id;
+@Entity
+public class Alien {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
 
     private String aname;
 
@@ -24,11 +31,11 @@ public class Alien {
         this.tech = tech;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
